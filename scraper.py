@@ -1,19 +1,20 @@
 
+
+#%%
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 # %%
 def CollectARComCoList():
-    options = Options()
+    options = webdriver.FirefoxOptions()
     options.headless = True
     options.set_preference("security.sandbox.content.level", 5)
     browser = webdriver.Firefox(options=options)
 
     company_list = []
-
     for i in range(1, 10):
-        annual_reports_webpage = 'http://www.annualreports.com/Companies?exch=%s' %i
+        annual_reports_webpage = f"http://www.annualreports.com/Companies?exch={i}"
         print(annual_reports_webpage)
 
         browser.get(annual_reports_webpage)
@@ -33,4 +34,9 @@ def CollectARComCoList():
             row['UrlAr'] = td[0].find_element_by_xpath(".//a").get_attribute('href')
             company_list.append( row )
 
-    return pd.DataFrame(company_list)
+    return pd.DataFrame( company_list )
+
+#%%
+if __name__ == "__main__":
+    df = CollectARComCoList()
+
