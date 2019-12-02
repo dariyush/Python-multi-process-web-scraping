@@ -42,7 +42,7 @@ def collect_ar_company_list():
     company_list = []
 
     for i in range(1, 10):
-        annual_reports_webpage = 'http://www.annualreports.com/Companies?exch=%s' %i
+        annual_reports_webpage = 'http://www.xxxxxxxxxxx.com/Companies?exch=%s' %i
         print(annual_reports_webpage)
 
         browser.get(annual_reports_webpage)
@@ -131,7 +131,7 @@ def collect_ar_companies_info():
     browser.quit()
     return companies
 
-#companies.to_csv('companies in annualreports all info.csv')
+#companies.to_csv('companies in xxxxxxxxx all info.csv')
 
 #%%
 def CollectCompanyFiles(company):
@@ -185,7 +185,7 @@ def CollectCompanyFiles(company):
 
 #%%
 def IsInKorcula(file):
-    with GetConnection('AMESYD03','SafeEC') as connection:
+    with GetConnection('ddddddd','SafeEC') as connection:
         query = f"""select top 1 [ID] from [KorculaFile]
                         where [MD5] = N'{file['Hash']}' """
         dummy = pd.read_sql(query, connection)
@@ -208,14 +208,14 @@ def CollectFileInfo(file):
                     if not file['Name'].lower().endswith('.pdf') else file['Name']
     
     # Check if file['URL'] has already been downloaded correctly.
-    with GetConnection('AMESYDP8','Korcula') as connection:
+    with GetConnection('ffffffff','ggggggggg') as connection:
         query = f"""select top 1 [ID], [MD5] from [dbo].[KorculaFileRecommendation]
                     where [OriginalPath] = N'{file['URL']}' """
         dummy = pd.read_sql(query, connection).to_dict('records')
     if len(dummy): 
         file['ID'], file['Hash'] = dummy[0]['ID'], dummy[0]['MD5']
         file['InKorcula'] = IsInKorcula(file)
-        file['Path'] = fr"\\AMESYDP8\Korcula\{file['ID']}.pdf"
+        file['Path'] = fr"\\ggggggggggg\{file['ID']}.pdf"
         file['AlreadyDownloaded'] = AlreadyDownloaded(file)
         if file['AlreadyDownloaded']:
             return file
@@ -255,7 +255,7 @@ def AlreadyDownloaded(file):
     return False
 #%%
 def GetKRStatus( file ):
-    with GetConnection('AMESYDP8','Korcula') as connection:
+    with GetConnection('ggggggggg','ddddddddd') as connection:
         query = f"""select top 1 [ID] from [dbo].[KorculaFileRecommendation]
                     where [MD5] = N'{file['Hash']}' """
         kfr_ids = pd.read_sql(query, connection).to_dict('records')
@@ -264,13 +264,13 @@ def GetKRStatus( file ):
         file['ID'] = kfr_ids[0]['ID']
     else:
         
-        with GetConnection('AMESYDP8','Korcula') as connection:
+        with GetConnection('ggggggg','dddddd') as connection:
             with connection.cursor() as cursor:
                 file_name = re.sub(r'\'', '', file['Name'])
                 file_title = re.sub(r'\'', '', file['Title'])
                 file_url = re.sub(r'\'', '', file['URL'])[:850] #indexing limitation
                 query = f"""SET NOCOUNT ON
-                            insert into [dbo].[KorculaFileRecommendation]
+                            insert into [dbo].[hhhhhhhhhhhhhh]
                             ([UpdateBy], [UpdateDate], [Type], [ConsumerID],
                             [CategoryID], [Period],[FileName] ,
                             [OriginalPath] ,[MD5], [Title],
@@ -287,7 +287,7 @@ def GetKRStatus( file ):
                 file['ID'] = cursor.fetchall()[0][0]
                 connection.commit()
         
-    file['Path'] = fr"\\AMESYDP8\Korcula\{file['ID']}.pdf"
+    file['Path'] = fr"\\ttttttttttt\{file['ID']}.pdf"
     
     return file
 
@@ -296,7 +296,7 @@ def UpdateKR(df):
     if len(df) < 1:
         return 1
 
-    with GetConnection('AMESYDP8','Korcula') as connection:
+    with GetConnection('fffff','ggggggggg') as connection:
         with connection.cursor() as cursor:
             
             for f in df[(df['CoID']!=-1)
@@ -309,7 +309,7 @@ def UpdateKR(df):
                 file_name = re.sub(r'\'', '', f['Name'])
                 file_title = re.sub(r'\'', '', f['Title'])
                 file_url = re.sub(r'\'', '', f['URL'])[:850]
-                query = f"""update [dbo].[KorculaFileRecommendation]
+                query = f"""update [dbo].[hhhhhhhhhh]
                             set [UpdateDate] = GETDATE(),
                             [Type] = N'{f['ConsumerType']}',
                             [ConsumerID]={f['CoID']},
@@ -332,9 +332,9 @@ def UpdateKR(df):
 #%%
 def ProcessCompany(company):
         # company = companies.to_dict('records')[8] %%EOF\r\n
-        # company = companies[companies['UrlAr']=='http://www.annualreports.com/Company/bitauto'].to_dict('records')[0]
+        # company = companies[companies['UrlAr']=='http://www.xxxxxxxxx.com/Company/bitauto'].to_dict('records')[0]
         # file = df_files.to_dict('records')[0]
-        # import os; os.remove(r"\\AMESYDP8\Korcula\4449009.pdf") 
+        # import os; os.remove(r"\\hhhhhhhhhhh\4449009.pdf") 
     try:
         df_files = CollectCompanyFiles( company )
         UpdateKR(df_files)
@@ -360,7 +360,7 @@ def multiprocessing(companies):
 def collect_companies():
     
 #    companies = collect_ar_companies_info()
-#    companies = pd.read_csv('companies in annualreports all info 20170708.csv',
+#    companies = pd.read_csv('companies in xxxxxxxxx all info 20170708.csv',
 #                            encoding = "ISO-8859-1")
 #    companies = companies.drop(['Unnamed: 0'], axis=1)#[:5]
     companies['MarketAr'] = companies['PropertyValue_1'].apply(lambda s: s.split()[0])
@@ -370,30 +370,30 @@ def collect_companies():
     companies['MarketTicker'] = companies['MarketAr'] + ':' + companies['TickerAr']
     companies['CoID'] = -1
     companies['CoNm'] = ''
-#    companies.to_csv('companies in annualreports all info 20170814.csv', index=False)
+#    companies.to_csv('companies in xxxxxxxxxx all info 20170814.csv', index=False)
 
-    #### Match to AME companies
-    query = """SELECT c.CoID, c.CoNm, c.Website, se.[AMEDirect], c.TickerCode1b Ticker
+    #### Match to tttttt companies
+    query = """SELECT c.CoID, c.CoNm, c.Website, se.[ttttttttt], c.TickerCode1b Ticker
               FROM [SafeEc].[dbo].[Company] c
               left join [SafeEc].[dbo].[StockExchange] se
                   on c.TickerCode1 = se.ID
-              where se.[AMEDirect] is not null and c.TickerCode1b <> ''
+              where se.[tttttttt] is not null and c.TickerCode1b <> ''
         union
-        SELECT c.CoID, c.CoNm, c.Website, se.[AMEDirect], c.TickerCode2b Ticker
+        SELECT c.CoID, c.CoNm, c.Website, se.[ttttttttttttt], c.TickerCode2b Ticker
             FROM [SafeEc].[dbo].[Company] c
             left join [SafeEc].[dbo].[StockExchange] se
             on c.TickerCode2 = se.ID
-            where se.[AMEDirect] is not null and c.TickerCode2b <> ''
+            where se.[ttttttt] is not null and c.TickerCode2b <> ''
         union
-        SELECT c.CoID, c.CoNm, c.Website, se.[AMEDirect], c.TickerCode3b Ticker
+        SELECT c.CoID, c.CoNm, c.Website, se.[tttttttttttt], c.TickerCode3b Ticker
             FROM [SafeEc].[dbo].[Company] c
             left join [SafeEc].[dbo].[StockExchange] se
             on c.TickerCode3 = se.ID
-            where se.[AMEDirect] is not null and c.TickerCode3b <> ''"""
+            where se.[tttttttttt] is not null and c.TickerCode3b <> ''"""
 
-    with GetConnection('AMESYD03','SafeEc') as connection:
+    with GetConnection('ttttttt','tttttttt') as connection:
         companies_info = pd.read_sql(query, connection)
-    companies_info['MarketTicker'] = companies_info['AMEDirect'] + ':' + companies_info['Ticker']
+    companies_info['MarketTicker'] = companies_info['xxxxxx'] + ':' + companies_info['Ticker']
 
     for i in companies_info.index:
         company_website = companies_info.at[i, 'Website']
